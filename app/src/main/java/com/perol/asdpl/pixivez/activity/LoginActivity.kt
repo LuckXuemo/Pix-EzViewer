@@ -36,6 +36,7 @@ import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.perol.asdpl.pixivez.R
 import com.perol.asdpl.pixivez.networks.RestClient
@@ -48,6 +49,8 @@ import com.perol.asdpl.pixivez.responses.PixivOAuthResponse
 import com.perol.asdpl.pixivez.services.OAuthSecureService
 import com.perol.asdpl.pixivez.services.Works
 import com.perol.asdpl.pixivez.sql.UserEntity
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
+import com.uber.autodispose.autoDispose
 import io.noties.markwon.Markwon
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -239,8 +242,11 @@ class LoginActivity : RinkActivity() {
             map["get_secure_url"] = true
             map["include_policy"] = true
 
-            oAuthSecureService.postAuthToken(map).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread()).subscribe(object : Observer<PixivOAuthResponse> {
+            oAuthSecureService.postAuthToken(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .autoDispose(AndroidLifecycleScopeProvider.from(this))
+                .subscribe(object : Observer<PixivOAuthResponse> {
                         override fun onSubscribe(d: Disposable) {
                             Toast.makeText(applicationContext, getString(R.string.try_to_login), Toast.LENGTH_SHORT).show()
                         }

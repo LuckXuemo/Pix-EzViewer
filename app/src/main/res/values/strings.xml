@@ -265,6 +265,7 @@
     <string name="supporttitle">支持</string>
     <string name="viewreport">查看报告</string>
     <string name="needtorestart">重启应用生效</string>
+    <string name="restart_now">立即重启</string>
     <string name="animation">动画</string>
     <string name="title_activity_progress">ProgressActivity</string>
     <string name="download_progress">下载进度</string>

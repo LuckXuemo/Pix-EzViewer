@@ -33,10 +33,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
-import com.perol.asdpl.pixivez.BuildConfig
 import com.perol.asdpl.pixivez.objects.CrashHandler
 import java.io.File
-
 
 class PxEZApp : Application() {
     //    override fun attachBaseContext(base: Context) {
@@ -74,40 +72,61 @@ class PxEZApp : Application() {
 
         WorkManager.getInstance(this).pruneWork()
 
-        if (BuildConfig.DEBUG) {
-            registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
-                override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                    Log.v(TAG, "${activity.simpleName}: onActivityCreated.")
-                }
+        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+                Log.v(TAG, "${activity.simpleName}: onActivityCreated.")
 
-                override fun onActivityStarted(activity: Activity) {
-                    Log.v(TAG, "${activity.simpleName}: onActivityStarted.")
-                }
+                ActivityCollector.collect(activity)
+            }
 
-                override fun onActivityResumed(activity: Activity) {
-                    Log.v(TAG, "${activity.simpleName}: onActivityResumed.")
-                }
+            override fun onActivityStarted(activity: Activity) {
+                Log.v(TAG, "${activity.simpleName}: onActivityStarted.")
+            }
 
-                override fun onActivityPaused(activity: Activity) {
-                    Log.v(TAG, "${activity.simpleName}: onActivityPaused.")
-                }
+            override fun onActivityResumed(activity: Activity) {
+                Log.v(TAG, "${activity.simpleName}: onActivityResumed.")
+            }
 
-                override fun onActivityStopped(activity: Activity) {
-                    Log.v(TAG, "${activity.simpleName}: onActivityStopped.")
-                }
+            override fun onActivityPaused(activity: Activity) {
+                Log.v(TAG, "${activity.simpleName}: onActivityPaused.")
+            }
 
-                override fun onActivityDestroyed(activity: Activity) {
-                    Log.v(TAG, "${activity.simpleName}: onActivityDestroyed.")
-                }
+            override fun onActivityStopped(activity: Activity) {
+                Log.v(TAG, "${activity.simpleName}: onActivityStopped.")
+            }
 
-                override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-                    //
-                }
-            })
-        }
+            override fun onActivityDestroyed(activity: Activity) {
+                Log.v(TAG, "${activity.simpleName}: onActivityDestroyed.")
+
+                ActivityCollector.discard(activity)
+            }
+
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+                //
+            }
+        })
     }
 
     private val Activity.simpleName get() = javaClass.simpleName
+
+    object ActivityCollector {
+        @JvmStatic
+        private val activityList = mutableListOf<Activity>()
+
+        fun collect(activity: Activity) {
+            activityList.add(activity)
+        }
+
+        fun discard(activity: Activity) {
+            activityList.remove(activity)
+        }
+
+        fun recreate() {
+            for (i in activityList.size - 1 downTo 0) {
+                activityList[i].recreate()
+            }
+        }
+    }
 
     companion object {
         @JvmStatic

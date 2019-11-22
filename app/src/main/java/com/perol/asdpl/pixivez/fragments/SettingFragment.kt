@@ -34,6 +34,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.perol.asdpl.pixivez.BuildConfig
 import com.perol.asdpl.pixivez.R
 import com.perol.asdpl.pixivez.activity.PathProviderActivity
@@ -45,7 +46,6 @@ import java.io.File
 import java.io.FilenameFilter
 import java.io.IOException
 import java.util.*
-
 
 class SettingFragment : PreferenceFragmentCompat(), IconDialog.Callback {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,7 +129,13 @@ class SettingFragment : PreferenceFragmentCompat(), IconDialog.Callback {
             }
         }
         findPreference<ListPreference>("language")!!.setOnPreferenceChangeListener { preference, newValue ->
-            Toasty.normal(PxEZApp.instance, getString(R.string.needtorestart), Toast.LENGTH_SHORT).show()
+            //            Toasty.normal(PxEZApp.instance, getString(R.string.needtorestart), Toast.LENGTH_SHORT).show()
+            Snackbar.make(requireView(), getString(R.string.needtorestart), Snackbar.LENGTH_SHORT)
+                .setAction(R.string.restart_now) {
+                    PxEZApp.language = newValue.toString().toInt()
+                    PxEZApp.ActivityCollector.recreate()
+                }
+                .show()
             true
         }
 
